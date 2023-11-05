@@ -1,6 +1,6 @@
-#include <stdio.h>
+#include <iostream>
 #include "define.h"
-
+using namespace std;
 static void print_board(int i, int j)
 {
 	if (i == 1 && j == 1)
@@ -38,9 +38,9 @@ void print(void)
 			{
 				if (j == 0)
 					printf("%2d", i);
-				else if (ChessBoard[i - 1][j - 1] == BLACK)
+				else if (m_RenjuBoard[i - 1][j - 1] == BLACK)
 					printf(" ○ ");
-				else if (ChessBoard[i - 1][j - 1] == WHITE)
+				else if (m_RenjuBoard[i - 1][j - 1] == WHITE)
 					printf(" ● ");
 				else
 					print_board(i, j);
@@ -48,10 +48,9 @@ void print(void)
 			printf("\n");
 		}
 		printf("row\n");
-		printf("Search Depth is set to %d\n", search_depth);
+		printf("Search Depth is set to %d\n", m_nSearchDepth);
 		if (computer_move.moved)
 		{
-			printf("Computer: %ld CPU time.\n", search_time);
 			printf("Computer: [move %d %d]\nThe computer move at column %d row %d.\n",
 				   computer_move.col, computer_move.row, computer_move.col, computer_move.row);
 		}
@@ -64,9 +63,9 @@ void print(void)
 			{
 				if (j == 0)
 					printf("%2d", i);
-				else if (ChessBoard[i - 1][j - 1] == WHITE)
+				else if (m_RenjuBoard[i - 1][j - 1] == WHITE)
 					printf(" ○ ");
-				else if (ChessBoard[i - 1][j - 1] == BLACK)
+				else if (m_RenjuBoard[i - 1][j - 1] == BLACK)
 					printf(" ● ");
 				else
 					print_board(i, j);
@@ -74,10 +73,9 @@ void print(void)
 			printf("\n");
 		}
 		printf("row\n");
-		printf("Search Depth is set to %d\n", search_depth);
+		printf("Search Depth is set to %d\n", m_nSearchDepth);
 		if (computer_move.moved)
 		{
-			printf("Computer: %ld CPU time.\n", search_time);
 			printf("Computer: [move %d %d]\nThe computer move at column %d row %d.\n",
 				   computer_move.col, computer_move.row, computer_move.col, computer_move.row);
 		}

@@ -1,26 +1,30 @@
-C = clang
-ARGS = -Wall -std=c11
-main: main.o createmoves.o evaluate.o makemove.o printchessboard.o gameover.o globals.o searchmove.o utils.o wrapper.o
-	$(C) $(ARGS) -o main main.o createmoves.o evaluate.o makemove.o printchessboard.o gameover.o globals.o searchmove.o utils.o wrapper.o
-main.o: main.c
-	$(C) $(ARGS) -c -o main.o main.c
-createmoves.o: createmoves.c
-	$(C) $(ARGS) -c -o createmoves.o createmoves.c
-evaluate.o: evaluate.c
-	$(C) $(ARGS) -c -o evaluate.o evaluate.c
-gameover.o: gameover.c
-	$(C) $(ARGS) -c -o gameover.o gameover.c
-globals.o: globals.c
-	$(C) $(ARGS) -c -o globals.o globals.c
-makemove.o: makemove.c
-	$(C) $(ARGS) -c -o makemove.o makemove.c
-printchessboard.o: printchessboard.c
-	$(C) $(ARGS) -c -o printchessboard.o printchessboard.c
-searchmove.o: searchmove.c
-	$(C) $(ARGS) -c -o searchmove.o searchmove.c
-utils.o: utils.c
-	$(C) $(ARGS) -c -o utils.o utils.c
-wrapper.o: wrapper.c
-	$(C) $(ARGS) -c -o wrapper.o wrapper.c
+CXX = clang++
+ARGS = -Wall -std=c++17 -O0
+main: main.o createmoves.o makemove.o searchmove.o printchessboard.o evaluate.o gameover.o utils.o globals.o hashutils.o history.o wrapper.o
+	$(CXX) $(ARGS) -o main history.o wrapper.o hashutils.o globals.o createmoves.o utils.o makemove.o main.o searchmove.o printchessboard.o evaluate.o gameover.o
+hashutils.o: hashutils.cpp
+	$(CXX) $(ARGS) -c -o hashutils.o hashutils.cpp
+createmoves.o: createmoves.cpp
+	$(CXX) $(ARGS) -c -o createmoves.o createmoves.cpp
+evaluate.o: evaluate.cpp
+	$(CXX) $(ARGS) -c -o evaluate.o evaluate.cpp
+gameover.o: gameover.cpp
+	$(CXX) $(ARGS) -c -o gameover.o gameover.cpp
+makemove.o: makemove.cpp
+	$(CXX) $(ARGS) -c -o makemove.o makemove.cpp
+printchessboard.o: printchessboard.cpp
+	$(CXX) $(ARGS) -c -o printchessboard.o printchessboard.cpp
+searchmove.o: searchmove.cpp
+	$(CXX) $(ARGS) -c -o searchmove.o searchmove.cpp
+main.o: main.cpp
+	$(CXX) $(ARGS) -c -o main.o main.cpp
+utils.o: utils.cpp
+	$(CXX) $(ARGS) -c -o utils.o utils.cpp
+globals.o: globals.cpp
+	$(CXX) $(ARGS) -c -o globals.o globals.cpp
+history.o: history.cpp
+	$(CXX) $(ARGS) -c -o history.o history.cpp
+wrapper.o: wrapper.cpp
+	$(CXX) $(ARGS) -c -o wrapper.o wrapper.cpp
 clean:
 	rm *.o main

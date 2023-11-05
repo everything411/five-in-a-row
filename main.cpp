@@ -1,15 +1,15 @@
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
-#include <time.h>
+#include <cstdio>
+#include <cstring>
+#include <cstdlib>
+#include <ctime>
 #include "define.h"
 #include "function.h"
-#include <stdbool.h>
+using namespace std;
 
 int main(int argc, char const *argv[])
 {
-	char input[64] = { 0 };
-
+	char input[64] = {0};
+	
 	init();
 	clear();
 	puts("This program will exit when it receives EOF.");

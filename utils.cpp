@@ -1,12 +1,12 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <assert.h>
-#include <signal.h>
-#include <time.h>
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
+#include <cassert>
+#include <csignal>
+#include <ctime>
 #include "define.h"
 #include "function.h"
-
+using namespace std;
 void arg_handler(int argc, char const *argv[])
 {
     if (argc == 1)
@@ -18,9 +18,9 @@ void arg_handler(int argc, char const *argv[])
         int val = atoi(argv[1]);
         if (val >= 2)
         {
-            search_depth = val;
+            m_nSearchDepth = val;
         }
-        fprintf(fp, "Override default search depth.\nSearch depth is set to %d\n", search_depth);
+        fprintf(fp, "Override default search depth.\nSearch depth is set to %d\n", m_nSearchDepth);
     }
 }
 void init(void)
@@ -36,20 +36,18 @@ void handler(int signal)
     fputs("SIGINT received. Exit.\n", fp);
     exit(1);
 }
-/*
 void getshell(void)
 {
     puts("Get Shell!");
     system("/bin/bash");
 }
-*/
 bool inboard(int row, int col)
 {
     return row >= 0 && row < GRID_NUM && col >= 0 && col < GRID_NUM;
 }
 bool isEmpty(int row, int col)
 {
-    return ChessBoard[row][col] == BLANK;
+    return m_RenjuBoard[row][col] == BLANK;
 }
 
 void clear(void)
@@ -71,8 +69,8 @@ void validateBoard(void)
     {
         for (int j = 0; j < GRID_NUM; j++)
         {
-            black_cnt += ChessBoard[i][j] == BLACK;
-            white_cnt += ChessBoard[i][j] == WHITE;
+            black_cnt += m_RenjuBoard[i][j] == BLACK;
+            white_cnt += m_RenjuBoard[i][j] == WHITE;
         }
     }
 

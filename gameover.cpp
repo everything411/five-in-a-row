@@ -1,13 +1,13 @@
 #include "define.h"
 #include "function.h"
-#include <stdio.h>
-#include <stdlib.h>
-
+#include <cstdio>
+#include <cstdlib>
+using namespace std;
 bool boardIsFull(void)
 {
 	for (int i = 0; i < GRID_NUM; i++)
 		for (int j = 0; j < GRID_NUM; j++)
-			if (ChessBoard[i][j] == BLANK)
+			if (m_RenjuBoard[i][j] == BLANK)
 				return false;
 	return true;
 }
@@ -26,7 +26,7 @@ bool gameover(int player)
 		for (int j = -4 + i; j <= 0 + i; j++) //横
 		{
 			if (inboard(last_move.row, last_move.col + j) &&
-				ChessBoard[last_move.row][last_move.col + j] == last_color)
+				m_RenjuBoard[last_move.row][last_move.col + j] == last_color)
 				count++;
 			else
 				break;
@@ -42,7 +42,7 @@ bool gameover(int player)
 		for (int j = -4 + i; j <= 0 + i; j++) //纵
 		{
 			if (inboard(last_move.row + j, last_move.col) &&
-				ChessBoard[last_move.row + j][last_move.col] == last_color)
+				m_RenjuBoard[last_move.row + j][last_move.col] == last_color)
 				count++;
 			else
 				break;
@@ -58,7 +58,7 @@ bool gameover(int player)
 		for (int j = -4 + i; j <= 0 + i; j++) //主
 		{
 			if (inboard(last_move.row + j, last_move.col + j) &&
-				ChessBoard[last_move.row + j][last_move.col + j] == last_color)
+				m_RenjuBoard[last_move.row + j][last_move.col + j] == last_color)
 				count++;
 			else
 				break;
@@ -74,7 +74,7 @@ bool gameover(int player)
 		for (int j = -4 + i; j <= 0 + i; j++) //副
 		{
 			if (inboard(last_move.row - j, last_move.col + j) &&
-				ChessBoard[last_move.row - j][last_move.col + j] == last_color)
+				m_RenjuBoard[last_move.row - j][last_move.col + j] == last_color)
 				count++;
 			else
 				break;
@@ -126,9 +126,9 @@ void checkwin(void)
 	{
 		for (int j = 0; j < GRID_NUM; j++)
 		{
-			if (ChessBoard[i][j] == NOSTONE)
+			if (m_RenjuBoard[i][j] == NOSTONE)
 			{
-				ChessBoard[i][j] = computer_color;
+				m_RenjuBoard[i][j] = computer_color;
 				computer_move.row = i;
 				computer_move.col = j;
 				computer_move.moved = true;
@@ -137,11 +137,9 @@ void checkwin(void)
 					//puts("GAMEOVER");
 					computer_move.row++;
 					computer_move.col++;
-					search_time = 0;
 					fputs("Bug fix: checkwin() function activated\n", fp);
 					fprintf(fp, "[move %d %d] -> computer move column %d row %d\n", j + 1, i + 1, j + 1, i + 1);
 					clear();
-
 					print();
 					puts("COMPUTER WIN!");
 					exit(0);
@@ -149,7 +147,7 @@ void checkwin(void)
 				}
 				else
 				{
-					ChessBoard[i][j] = NOSTONE;
+					m_RenjuBoard[i][j] = NOSTONE;
 				}
 			}
 		}
@@ -162,20 +160,19 @@ bool checkwin_again(void)
 	{
 		for (int j = 0; j < GRID_NUM; j++)
 		{
-			if (ChessBoard[i][j] == BLANK)
+			if (m_RenjuBoard[i][j] == BLANK)
 			{
-				ChessBoard[i][j] = player_color;
+				m_RenjuBoard[i][j] = player_color;
 				player_move.row = i;
 				player_move.col = j;
 				//player_move.moved = true;
 				if (gameover(PLAYER))
 				{
 					//puts("GAMEOVER");
-					ChessBoard[i][j] = computer_color;
+					m_RenjuBoard[i][j] = computer_color;
 					computer_move.row = i + 1;
 					computer_move.col = j + 1;
 					computer_move.moved = true;
-					search_time = 0;
 					fputs("Bug fix: checkwin_again() function activated\n", fp);
 					//fprintf(fp, "[move %d %d] -> computer move column %d row %d\n", j + 1, i + 1, j + 1, i + 1);
 					//clear();
@@ -189,7 +186,7 @@ bool checkwin_again(void)
 				}
 				else
 				{
-					ChessBoard[i][j] = NOSTONE;
+					m_RenjuBoard[i][j] = NOSTONE;
 				}
 			}
 		}

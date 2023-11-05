@@ -1,10 +1,10 @@
 #include "function.h"
 #include "define.h"
-#include <stdio.h>
-#include <string.h>
-#include <time.h>
-#include <stdlib.h>
-
+#include <cstdio>
+#include <cstring>
+#include <ctime>
+#include <cstdlib>
+using namespace std;
 void computer_init_wrapper(void)
 {
     /*
@@ -19,15 +19,15 @@ void computer_init_wrapper(void)
         m_nSearchDepth = 4; //嗷!
     }
     */
-    //hash_flag = 0;
-    search_depth = 4; //嗷!
-    memset(ChessBoard, BLANK, sizeof(ChessBoard));
-    fprintf(fp, "Depth %d\n", search_depth);
-    //fprintf(fp, "hashutils is %s\n", hash_flag ? "ON" : "OFF");
+    hash_flag = 0;
+    m_nSearchDepth = 4; //嗷!
+    memset(m_RenjuBoard, BLANK, sizeof(m_RenjuBoard));
+    fprintf(fp, "Depth %d\n", m_nSearchDepth);
+    fprintf(fp, "hashutils is %s\n", hash_flag ? "ON" : "OFF");
 }
 void player_move_wrapper(int row, int col)
 {
-    ChessBoard[row - 1][col - 1] = player_color;
+    m_RenjuBoard[row - 1][col - 1] = player_color;
     //player_move.row = row;
     //player_move.col = col;
     fprintf(fp, "[move %d %d] -> player move column %d row %d\n", col, row, col, row);
@@ -37,11 +37,14 @@ void computerMove_wrapper(int color)
     checkwin();
     if (!checkwin_again())
     {
-        //int ori_depth = search_depth;
-        Player_color = player_color;
-        get_best_step(ChessBoard, computer_color);
+        int ori_depth = m_nSearchDepth;
+        m_nUserStoneColor = player_color;
+        CNegaScout_TT_HH();
+        CTranspositionTable();
+        SearchAGoodMove(m_RenjuBoard, computer_color);
+        _CTranspositionTable();
         /*
-    if (ChessBoard[X][Y] != NOSTONE)
+    if (m_RenjuBoard[X][Y] != NOSTONE)
     {
         printf("%d %d", Y, X);
         puts("The computer Eat a STONE!");
@@ -49,28 +52,20 @@ void computerMove_wrapper(int color)
         exit(1);
     }
     */
-        ChessBoard[X][Y] = computer_color;
+        m_RenjuBoard[X][Y] = computer_color;
 
-        //if (X == 0 && Y == 0 && color != -1)
-        //{
-        //    debug = 1;
-        //    ChessBoard[X][Y] = NOSTONE;
-        //    computerMove_wrapper(-1);
-            /*
-            ChessBoard[X][Y] = NOSTONE;
+        if (color != -1 && (PosValue[X][Y] < 2))
+        {
+            m_RenjuBoard[X][Y] = NOSTONE;
             fprintf(fp, "computer try to move column %d row %d\n", Y + 1, X + 1);
             fprintf(fp, "Bug Fix: Search Depth is set to 2\n");
-            search_depth = 2;
+            m_nSearchDepth = 2;
             computerMove_wrapper(-1);
-            search_depth = ori_depth;
-            fprintf(fp, "Bug Fix: Search Depth is set to %d\n", search_depth);
+            m_nSearchDepth = ori_depth;
+            fprintf(fp, "Bug Fix: Search Depth is set to %d\n", m_nSearchDepth);
             //fprintf(fp, "[move %d %d] -> computer move column %d %d\n", Y, X, Y, X);
             return;
-            */
-            //X = ;
-            //Y = ;
-        //    debug = 0;
-        //}
+        }
         computer_move.row = X + 1;
         computer_move.col = Y + 1;
         computer_move.moved = true;
@@ -84,7 +79,7 @@ void print_wrapper(void)
 }
 void computer_first_wrapper(void)
 {
-    ChessBoard[7][7] = computer_color;
+    m_RenjuBoard[7][7] = computer_color;
     computer_move.row = 8;
     computer_move.col = 8;
     computer_move.moved = true;

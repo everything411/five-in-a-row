@@ -1,8 +1,9 @@
 #include "define.h"
 #include "function.h"
-#include <string.h>
-
-int analyse_Line(unsigned char *position, int GridNum, int StonePos)
+#include <cstring>
+#include <unistd.h>
+using namespace std;
+int AnalysisLine(unsigned char *position, int GridNum, int StonePos)
 {
     unsigned char StoneType;
     unsigned char AnalyLine[30];
@@ -12,15 +13,16 @@ int analyse_Line(unsigned char *position, int GridNum, int StonePos)
 
     if (GridNum < 5)
     {
+        //数组长度小于5没有意义
         //fprintf(stderr, "len < 5\n");
         //printf("Something is wrong\n");
         //sleep(10);
         //exit(1);
-        memset(LineRecord, ANALSISED, GridNum);
+        memset(m_LineRecord, ANALSISED, GridNum);
         return 0;
     }
     nAnalyPos = StonePos;
-    memset(LineRecord, TO_BE_ANALSIS, 30);
+    memset(m_LineRecord, TOBEANALSIS, 30);
     memset(AnalyLine, 0x0F, 30);
     //将传入数组装入AnalyLine;
     memcpy(&AnalyLine, position, GridNum);
@@ -58,12 +60,22 @@ int analyse_Line(unsigned char *position, int GridNum, int StonePos)
             break;
         RightRange++;
     }
+    //如果此范围小于4则分析没有意义
+    /*
+    if (RightRange - LeftRange < 4)
+    {
+        for (int k = LeftRange; k <= RightRange; k++)
+            m_LineRecord[k] = ANALSISED;
+        return false;
+    }
+    */
+    //将连续区域设为分析过的,防止重复分析此一区域
     for (int k = LeftEdge; k <= RightEdge; k++)
-        LineRecord[k] = ANALSISED;
+        m_LineRecord[k] = ANALSISED;
     if (RightEdge - LeftEdge > 3)
     {
         //如待分析棋子棋型为五连
-        LineRecord[nAnalyPos] = FIVE;
+        m_LineRecord[nAnalyPos] = FIVE;
         return FIVE;
     }
 
@@ -82,17 +94,17 @@ int analyse_Line(unsigned char *position, int GridNum, int StonePos)
             //右边有气
             {
                 if (Leftfour == true)               //如左边有气
-                    LineRecord[nAnalyPos] = FOUR; //活四
+                    m_LineRecord[nAnalyPos] = FOUR; //活四
                 else
-                    LineRecord[nAnalyPos] = SFOUR; //冲四
+                    m_LineRecord[nAnalyPos] = SFOUR; //冲四
             }
             else if (Leftfour == true)           //如左边有气
-                LineRecord[nAnalyPos] = SFOUR; //冲四
+                m_LineRecord[nAnalyPos] = SFOUR; //冲四
             else if (Leftfour == true)           //如左边有气
-                LineRecord[nAnalyPos] = SFOUR; //冲四
+                m_LineRecord[nAnalyPos] = SFOUR; //冲四
         }
 
-        return LineRecord[nAnalyPos];
+        return m_LineRecord[nAnalyPos];
     }
 
     if (RightEdge - LeftEdge == 2)
@@ -107,8 +119,8 @@ int analyse_Line(unsigned char *position, int GridNum, int StonePos)
                 if (LeftEdge > 1 && AnalyLine[LeftEdge - 2] == AnalyLine[LeftEdge])
                 {
                     //左边隔一空白有己方棋子
-                    LineRecord[LeftEdge] = SFOUR; //冲四
-                    LineRecord[LeftEdge - 2] = ANALSISED;
+                    m_LineRecord[LeftEdge] = SFOUR; //冲四
+                    m_LineRecord[LeftEdge - 2] = ANALSISED;
                 }
                 else
                     LeftThree = true;
@@ -121,37 +133,37 @@ int analyse_Line(unsigned char *position, int GridNum, int StonePos)
                 if (RightEdge < GridNum - 1 && AnalyLine[RightEdge + 2] == AnalyLine[RightEdge])
                 {
                     //右边隔1个己方棋子
-                    LineRecord[RightEdge] = SFOUR; //冲四
-                    LineRecord[RightEdge + 2] = ANALSISED;
+                    m_LineRecord[RightEdge] = SFOUR; //冲四
+                    m_LineRecord[RightEdge + 2] = ANALSISED;
                 }
                 else if (LeftThree == true)          //如左边有气
-                    LineRecord[RightEdge] = THREE; //活三
+                    m_LineRecord[RightEdge] = THREE; //活三
                 else
-                    LineRecord[RightEdge] = STHREE; //冲三
+                    m_LineRecord[RightEdge] = STHREE; //冲三
             else
             {
-                if (LineRecord[LeftEdge] == SFOUR) //如左冲四
-                    return LineRecord[LeftEdge];   //返回
+                if (m_LineRecord[LeftEdge] == SFOUR) //如左冲四
+                    return m_LineRecord[LeftEdge];   //返回
 
                 if (LeftThree == true)                //如左边有气
-                    LineRecord[nAnalyPos] = STHREE; //眠三
+                    m_LineRecord[nAnalyPos] = STHREE; //眠三
             }
         else
         {
-            if (LineRecord[LeftEdge] == SFOUR)  //如左冲四
-                return LineRecord[LeftEdge];    //返回
+            if (m_LineRecord[LeftEdge] == SFOUR)  //如左冲四
+                return m_LineRecord[LeftEdge];    //返回
             if (LeftThree == true)                //如左边有气
-                LineRecord[nAnalyPos] = STHREE; //眠三
+                m_LineRecord[nAnalyPos] = STHREE; //眠三
         }
 
-        return LineRecord[nAnalyPos];
+        return m_LineRecord[nAnalyPos];
     }
 
     if (RightEdge - LeftEdge == 1)
     {
         //如待分析棋子棋型为二连
         bool Lefttwo = false;
-        //bool Leftthree = false;
+        bool Leftthree = false;
 
         if (LeftEdge > 2)
         {
@@ -163,15 +175,15 @@ int analyse_Line(unsigned char *position, int GridNum, int StonePos)
                     if (AnalyLine[LeftEdge - 3] == AnalyLine[LeftEdge])
                     {
                         //左边隔2个己方棋子
-                        LineRecord[LeftEdge - 3] = ANALSISED;
-                        LineRecord[LeftEdge - 2] = ANALSISED;
-                        LineRecord[LeftEdge] = SFOUR; //冲四
+                        m_LineRecord[LeftEdge - 3] = ANALSISED;
+                        m_LineRecord[LeftEdge - 2] = ANALSISED;
+                        m_LineRecord[LeftEdge] = SFOUR; //冲四
                     }
                     else if (AnalyLine[LeftEdge - 3] == NOSTONE)
                     {
                         //左边隔1个己方棋子
-                        LineRecord[LeftEdge - 2] = ANALSISED;
-                        LineRecord[LeftEdge] = STHREE; //眠三
+                        m_LineRecord[LeftEdge - 2] = ANALSISED;
+                        m_LineRecord[LeftEdge] = STHREE; //眠三
                     }
                     else
                         Lefttwo = true;
@@ -188,78 +200,78 @@ int analyse_Line(unsigned char *position, int GridNum, int StonePos)
                     if (AnalyLine[RightEdge + 3] == AnalyLine[RightEdge])
                     {
                         //右边隔两个己方棋子
-                        LineRecord[RightEdge + 3] = ANALSISED;
-                        LineRecord[RightEdge + 2] = ANALSISED;
-                        LineRecord[RightEdge] = SFOUR; //冲四
+                        m_LineRecord[RightEdge + 3] = ANALSISED;
+                        m_LineRecord[RightEdge + 2] = ANALSISED;
+                        m_LineRecord[RightEdge] = SFOUR; //冲四
                     }
                     else if (AnalyLine[RightEdge + 3] == NOSTONE)
                     {
                         //右边隔 1 个己方棋子
-                        LineRecord[RightEdge + 2] = ANALSISED;
-                        LineRecord[RightEdge] = STHREE; //眠三
+                        m_LineRecord[RightEdge + 2] = ANALSISED;
+                        m_LineRecord[RightEdge] = STHREE; //眠三
                     }
                     else
                     {
-                        if (LineRecord[LeftEdge] == SFOUR) //左边冲四
-                            return LineRecord[LeftEdge];   //返回
+                        if (m_LineRecord[LeftEdge] == SFOUR) //左边冲四
+                            return m_LineRecord[LeftEdge];   //返回
 
-                        if (LineRecord[LeftEdge] == STHREE) //左边眠三
-                            return LineRecord[LeftEdge];
+                        if (m_LineRecord[LeftEdge] == STHREE) //左边眠三
+                            return m_LineRecord[LeftEdge];
 
                         if (Lefttwo == true)
-                            LineRecord[nAnalyPos] = TWO; //返回活二
+                            m_LineRecord[nAnalyPos] = TWO; //返回活二
                         else
-                            LineRecord[nAnalyPos] = STWO; //眠二
+                            m_LineRecord[nAnalyPos] = STWO; //眠二
                     }
                 else
                 {
-                    if (LineRecord[LeftEdge] == SFOUR) //冲四返回
-                        return LineRecord[LeftEdge];
+                    if (m_LineRecord[LeftEdge] == SFOUR) //冲四返回
+                        return m_LineRecord[LeftEdge];
 
                     if (Lefttwo == true) //眠二
-                        LineRecord[nAnalyPos] = STWO;
+                        m_LineRecord[nAnalyPos] = STWO;
                 }
             }
         }
 
-        return LineRecord[nAnalyPos];
+        return m_LineRecord[nAnalyPos];
     }
 
     return 0;
 }
 
 //分析棋盘上某点在水平方向上的棋型
-int analyse_Horizon(unsigned char position[][GRID_NUM], int i, int j)
+int AnalysisHorizon(unsigned char position[][GRID_NUM], int i, int j)
 {
     //调用直线分析函数分析
-    analyse_Line(position[i], GRID_NUM, j);
+    AnalysisLine(position[i], GRID_NUM, j);
     //拾取分析结果
     for (int s = 0; s < GRID_NUM; s++)
-        if (LineRecord[s] != TO_BE_ANALSIS)
-            TypeRecord[i][s][0] = LineRecord[s];
+        if (m_LineRecord[s] != TOBEANALSIS)
+            TypeRecord[i][s][0] = m_LineRecord[s];
 
     return TypeRecord[i][j][0];
 }
 
 //分析棋盘上某点在垂直方向上的棋型
-int analyse_Vertical(unsigned char position[][GRID_NUM], int i, int j)
+int AnalysisVertical(unsigned char position[][GRID_NUM], int i, int j)
 {
     unsigned char tempArray[GRID_NUM];
     //将垂直方向上的棋子转入一维数组
     for (int k = 0; k < GRID_NUM; k++)
         tempArray[k] = position[k][j];
     //调用直线分析函数分析
-    analyse_Line(tempArray, GRID_NUM, i);
+    AnalysisLine(tempArray, GRID_NUM, i);
     //拾取分析结果
     for (int s = 0; s < GRID_NUM; s++)
-        if (LineRecord[s] != TO_BE_ANALSIS)
-            TypeRecord[s][j][1] = LineRecord[s];
+        if (m_LineRecord[s] != TOBEANALSIS)
+            TypeRecord[s][j][1] = m_LineRecord[s];
 
     return TypeRecord[i][j][1];
 }
 
 //分析棋盘上某点在左斜方向上的棋型
-int analyse_Left(unsigned char position[][GRID_NUM], int i, int j)
+int AnalysisLeft(unsigned char position[][GRID_NUM], int i, int j)
 {
     unsigned char tempArray[GRID_NUM];
     int x, y;
@@ -282,17 +294,17 @@ int analyse_Left(unsigned char position[][GRID_NUM], int i, int j)
         tempArray[k] = position[y + k][x + k];
     }
     //调用直线分析函数分析
-    analyse_Line(tempArray, k, j - x);
+    AnalysisLine(tempArray, k, j - x);
     //拾取分析结果
     for (int s = 0; s < k; s++)
-        if (LineRecord[s] != TO_BE_ANALSIS)
-            TypeRecord[y + s][x + s][2] = LineRecord[s];
+        if (m_LineRecord[s] != TOBEANALSIS)
+            TypeRecord[y + s][x + s][2] = m_LineRecord[s];
 
     return TypeRecord[i][j][2];
 }
 
 //分析棋盘上某点在右斜方向上的棋型
-int analyse_Right(unsigned char position[][GRID_NUM], int i, int j)
+int AnalysisRight(unsigned char position[][GRID_NUM], int i, int j)
 {
     unsigned char tempArray[GRID_NUM];
     int x, y, realnum;
@@ -317,11 +329,11 @@ int analyse_Right(unsigned char position[][GRID_NUM], int i, int j)
         tempArray[k] = position[y - k][x + k];
     }
     //调用直线分析函数分析
-    analyse_Line(tempArray, k, j - x);
+    AnalysisLine(tempArray, k, j - x);
     //拾取分析结果
     for (int s = 0; s < k; s++)
-        if (LineRecord[s] != TO_BE_ANALSIS)
-            TypeRecord[y - s][x + s][3] = LineRecord[s];
+        if (m_LineRecord[s] != TOBEANALSIS)
+            TypeRecord[y - s][x + s][3] = m_LineRecord[s];
 
     return TypeRecord[i][j][3];
 }
@@ -329,13 +341,13 @@ int analyse_Right(unsigned char position[][GRID_NUM], int i, int j)
 int Evaluate(unsigned char position[][GRID_NUM], bool bIsWhiteTurn)
 {
     //return wwww(position, bIsWhiteTurn);
-    //int ret_val;
+    int ret_val;
     int i, j, k;
     unsigned char nStoneType;
     count++; //计数器累加
 
     //清空棋型分析结果
-    memset(TypeRecord, TO_BE_ANALSIS, sizeof(TypeRecord));
+    memset(TypeRecord, TOBEANALSIS, sizeof(TypeRecord));
     memset(TypeCount, 0, sizeof(TypeCount));
 
     for (i = 0; i < GRID_NUM; i++)
@@ -344,20 +356,20 @@ int Evaluate(unsigned char position[][GRID_NUM], bool bIsWhiteTurn)
             if (position[i][j] != NOSTONE)
             {
                 //如果水平方向上没有分析过
-                if (TypeRecord[i][j][0] == TO_BE_ANALSIS)
-                    analyse_Horizon(position, i, j);
+                if (TypeRecord[i][j][0] == TOBEANALSIS)
+                    AnalysisHorizon(position, i, j);
 
                 //如果垂直方向上没有分析过
-                if (TypeRecord[i][j][1] == TO_BE_ANALSIS)
-                    analyse_Vertical(position, i, j);
+                if (TypeRecord[i][j][1] == TOBEANALSIS)
+                    AnalysisVertical(position, i, j);
 
                 //如果左斜方向上没有分析过
-                if (TypeRecord[i][j][2] == TO_BE_ANALSIS)
-                    analyse_Left(position, i, j);
+                if (TypeRecord[i][j][2] == TOBEANALSIS)
+                    AnalysisLeft(position, i, j);
 
                 //如果右斜方向上没有分析过
-                if (TypeRecord[i][j][3] == TO_BE_ANALSIS)
-                    analyse_Right(position, i, j);
+                if (TypeRecord[i][j][3] == TOBEANALSIS)
+                    AnalysisRight(position, i, j);
             }
         }
 
